@@ -1,4 +1,6 @@
 const express = require('express');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv').config();
 
 const app = express();
 
@@ -9,7 +11,13 @@ app.get('/', (req, res) => {
 
 
 
-
-app.listen(8080, (req, res) => {
-  console.log('Listening on port 8080!');
-});
+// Connect to DB and start server
+const PORT = process.env.PORT || 8080;
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server Running on port ${PORT}`)
+    })
+  })
+  .catch((err) => console.log(err))
