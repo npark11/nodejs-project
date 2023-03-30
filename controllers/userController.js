@@ -1,5 +1,10 @@
 const User = require('../models/userModel');
-const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+};
 
 const registerUser = async (req, res) => {
   try {
@@ -26,10 +31,13 @@ const registerUser = async (req, res) => {
       password
     });
 
+    // Generate Token
+    const token = generateToken(user._id);
+
     if (user) {
-      const { _id, name, email, password, photo, phone, bio } = user;
+      const { _id, name, email, photo, phone, bio } = user;
       return res.status(201).json({
-        _id, name, email, password, photo, phone, bio
+        _id, name, email, photo, phone, bio, token
       })
     } else {
       return res.status(400).json({ error: 'Invalid user data' });
