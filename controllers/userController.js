@@ -85,13 +85,16 @@ const loginUser = async (req, res) => {
     const token = generateToken(user._id);
 
     // Send HTTP-only cookie
-    res.cookie("token", token, {
-      path: '/',
-      httpOnly: true,
-      expires: new Date(Date.now() + 1000 * 86400),
-      sameSite: "none",
-      secure: true
-    });
+    if (isMatch) {
+      res.cookie("token", token, {
+        path: '/',
+        httpOnly: true,
+        expires: new Date(Date.now() + 1000 * 86400),
+        sameSite: "none",
+        secure: true
+      });
+    };
+    
 
     if (user && isMatch) {
       const { _id, name, email, photo, phone, bio } = user;
@@ -107,5 +110,17 @@ const loginUser = async (req, res) => {
   }
 };
 
+// Logout User
+const logoutUser = async (req, res) => {
+  res.cookie("token", "", {
+    path: '/',
+    httpOnly: true,
+    expires: new Date(0),
+    sameSite: "none",
+    secure: true
+  });
+  return res.status(200).json({ message: 'Logged out successfully' });
+};
 
-module.exports = { registerUser, loginUser };
+
+module.exports = { registerUser, loginUser, logoutUser };
