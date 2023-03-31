@@ -122,5 +122,14 @@ const logoutUser = async (req, res) => {
   return res.status(200).json({ message: 'Logged out successfully' });
 };
 
+// User Profile - get user information
+const getUser = async (req, res) => {
+  try {
+    res.send("User Profile");
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};
 
-module.exports = { registerUser, loginUser, logoutUser };
+
+module.exports = { registerUser, loginUser, logoutUser, getUser };
