@@ -43,7 +43,7 @@ const registerUser = async (req, res) => {
       httpOnly: true,
       expires: new Date(Date.now() + 1000 * 86400),
       sameSite: "none",
-      secure: true
+      secure: false
     });
     
 
@@ -91,7 +91,7 @@ const loginUser = async (req, res) => {
         httpOnly: true,
         expires: new Date(Date.now() + 1000 * 86400),
         sameSite: "none",
-        secure: true
+        secure: false
       });
     };
     
@@ -100,7 +100,8 @@ const loginUser = async (req, res) => {
       const { _id, name, email, photo, phone, bio } = user;
       return res.status(200).json({
         _id, name, email, photo, phone, bio, token
-      })
+      });
+      
     } else {
       return res.status(400).json({ error: 'Invalid email or password' });
     }
@@ -119,17 +120,42 @@ const logoutUser = async (req, res) => {
     sameSite: "none",
     secure: true
   });
+
   return res.status(200).json({ message: 'Logged out successfully' });
 };
 
 // User Profile - get user information
 const getUser = async (req, res) => {
   try {
-    res.send("User Profile");
+    const user = await User.findById(req.user._id);
+
+    console.log(user);
+    if (user) {
+      const { _id, name, email, photo, phone, bio } = user;
+      return res.status(200).json({
+        _id, name, email, photo, phone, bio
+      });
+    } else {
+      return res.status(400).json({ error: 'User does not exist' });
+    }
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
 };
 
+// Get login status
+const loginStatus = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.json(false);
+    }
 
-module.exports = { registerUser, loginUser, logoutUser, getUser };
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+
+};
+
+
+module.exports = { registerUser, loginUser, logoutUser, getUser, loginStatus };

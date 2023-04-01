@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const protect = async (req, res, next) => {
   try {
     const token = req.cookies.token;
+    
     if (!token) {
       return res.status(401).json("Not authorized, please login");
     }
@@ -22,7 +23,7 @@ const protect = async (req, res, next) => {
     next();
 
   } catch (error) {
-
+    return res.status(401).json("Not authorized, please login");
   }
 };
 
