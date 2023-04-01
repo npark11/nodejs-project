@@ -129,7 +129,6 @@ const getUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
 
-    console.log(user);
     if (user) {
       const { _id, name, email, photo, phone, bio } = user;
       return res.status(200).json({
@@ -150,6 +149,13 @@ const loginStatus = async (req, res) => {
     if (!token) {
       return res.json(false);
     }
+
+    // Verify token
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    if (verified) {
+      return res.json(true);
+    }
+    return res.json(false);
 
   } catch (err) {
     return res.status(500).json({ error: err.message });
