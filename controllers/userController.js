@@ -196,5 +196,36 @@ const updateUser = async (req, res) => {
  }
 };
 
+// Update Password
+const updatePassword = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    const { oldPassword, newPassword } = req.body;
 
-module.exports = { registerUser, loginUser, logoutUser, getUser, loginStatus, updateUser };
+    if (!user) {
+      return res.status(404).json({ error: 'User does not exist' });
+    }
+
+    // Check if password is correct
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ error: 'Please fill all fields' });
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+
+    // Save new password
+    if (user && isMatch) {
+      user.password = newPassword;
+      await user.save();
+      return res.status(200).json({ message: 'Password updated successfully' });
+    } else {
+      return res.status(400).json({ error: 'Invalid email or password' });
+    }
+
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+
+module.exports = { registerUser, loginUser, logoutUser, getUser, loginStatus, updateUser, updatePassword };
