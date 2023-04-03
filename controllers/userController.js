@@ -227,5 +227,15 @@ const updatePassword = async (req, res) => {
   }
 };
 
+// Forgot Password
+const forgotPassword = async (req, res) => {
+  try {
+    return res.send("Forgot Password");
 
-module.exports = { registerUser, loginUser, logoutUser, getUser, loginStatus, updateUser, updatePassword };
+  } catch {
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+
+module.exports = { registerUser, loginUser, logoutUser, getUser, loginStatus, updateUser, updatePassword, forgotPassword };
