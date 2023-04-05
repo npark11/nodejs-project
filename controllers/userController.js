@@ -1,6 +1,9 @@
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const Token = require('../models/tokenModel');
+const crypto = require('crypto');
+const sendEmail = require('../utils/sendEmail');
 
 
 // Generate Token
@@ -230,7 +233,55 @@ const updatePassword = async (req, res) => {
 // Forgot Password
 const forgotPassword = async (req, res) => {
   try {
-    return res.send("Forgot Password");
+    const { email } = req.body;
+    const user = await User.findOne({ email});
+
+    if (!user) {
+      return res.status(404).json({ error: 'User does not exist' });
+    }
+
+    // Delete token if it exists in DB
+    let token = await Token.findOne({ userId: user._id });
+    if (token) {
+      await token.deleteOne();
+    }
+
+    // Create reset token
+    let resetToken = crypto.randomBytes(32).toString('hex') + user._id;
+    
+    // Hash token before saving it to DB
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+    // Save Token to DB
+    await new Token({
+      userId: user._id,
+      token: hashedToken,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 30 * (60 * 10000)       // 30 minutes
+    }).save();
+    
+    // Construct reset URL
+    const resetUrl = `${process.env.FRONT_END}/resetpassword/${resetToken}`;
+
+    // Reset email
+    const message = `
+     <h2>Hello, ${user.name}</h2>
+     <p>Please use the url below to reset your password.</p>
+     <p>This reset linke is valid for only 30 minutes.</p>
+     <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
+
+     <p>Thank you</p>
+    `;
+    const subject = 'Password Reset Request';
+    const send_to = user.email;
+    const sent_from = process.env.EMAIL_USER;
+
+    try {
+      await sendEmail(subject, message, send_to, sent_from);
+      res.status(200).json({ success: true, message: 'Email sent successfully' });
+    } catch (err) {
+      res.status(500).json("Email could not be sent, please try again");
+    }
 
   } catch {
     return res.status(500).json({ error: err.message });
