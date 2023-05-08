@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const userRoute = require('./routes/userRoute');
 const productRoute = require('./routes/productRoute');
+const path = require('path');
 
 const app = express();
 
@@ -18,6 +19,8 @@ app.use(cors({
   origin: ["http://localhost:3000", "https://pinvent-app.vercel.app"],
   credentials: true,
 }));
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes Middleware
 app.use('/api/users', userRoute);

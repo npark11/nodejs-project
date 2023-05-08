@@ -1,4 +1,6 @@
 const Product = require('../models/productModel');
+const { fileSizeFormatter } = require('../utils/fileUpload');
+fileSizeFormatter
 
 
 const createProduct = async (req, res) => {
@@ -10,8 +12,16 @@ const createProduct = async (req, res) => {
       return res.status(400).json({ error: 'Please fill all fields' });
     }
 
-    // Manage Image upload
-
+    // Handle Image upload
+    let fileData = {}
+    if (req.file) {
+      fileData = {
+        fileName: req.file.originalname,
+        filePath: req.file.path,
+        fileType: req.file.mimetype,
+        fileSize: fileSizeFormatter(req.file.size, 2),
+      }
+    }
   
     // Create Product
     const product = await Product.create({
@@ -22,6 +32,7 @@ const createProduct = async (req, res) => {
       quantity,
       price,
       description,
+      image: fileData
     });
 
     return res.status(201).json(product);
