@@ -62,6 +62,25 @@ const getProducts = async (req, res) => {
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
+};
+
+// Get Single Product
+const getProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json("Product not found");
+    }
+
+    if (product.user.toString() !== req.user.id) {
+      return res.status(401).json("User not authorized");
+    }
+
+    return res.status(200).json(product);
+
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
 }
 
 
@@ -76,4 +95,4 @@ const getProducts = async (req, res) => {
 
 
 
-module.exports = { createProduct, getProducts };
+module.exports = { createProduct, getProducts, getProduct };
