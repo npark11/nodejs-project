@@ -164,15 +164,6 @@ const updateProduct = async (req, res) => {
   }
 }
 
-// Get All Products
-// const  = async (req, res) => {
-//   try {
-
-//   } catch (err) {
-//     return res.status(500).json({ error: err.message });
-//   }
-// }
-
 
 
 module.exports = { createProduct, getProducts, getProduct, deleteProduct, updateProduct };
