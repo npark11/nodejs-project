@@ -83,6 +83,26 @@ const getProduct = async (req, res) => {
   }
 }
 
+// Delete Product
+const deleteProduct = async (req, res) => {
+  try {
+    let product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    if (product.user.toString() !== req.user.id) {
+      return res.status(401).json({ message: 'User not authorized' });
+    }
+
+    product = await Product.findByIdAndDelete(req.params.id);
+    return res.status(200).json({ message: 'Deleted successfully' });
+
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+}
 
 // Get All Products
 // const  = async (req, res) => {
@@ -95,4 +115,4 @@ const getProduct = async (req, res) => {
 
 
 
-module.exports = { createProduct, getProducts, getProduct };
+module.exports = { createProduct, getProducts, getProduct, deleteProduct };
