@@ -53,6 +53,27 @@ const createProduct = async (req, res) => {
 
 };
 
+// Get All Products
+const getProducts = async (req, res) => {
+  try {
+    const products = await Product.find({user: req.user.id}).sort("-createdAt");
+    return res.status(200).json(products);
+
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+}
 
 
-module.exports = { createProduct };
+// Get All Products
+// const  = async (req, res) => {
+//   try {
+
+//   } catch (err) {
+//     return res.status(500).json({ error: err.message });
+//   }
+// }
+
+
+
+module.exports = { createProduct, getProducts };
