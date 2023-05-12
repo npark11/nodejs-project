@@ -79,7 +79,28 @@ const getPost = async (req, res) => {
   }
 };
 
+// Delete Ppost
+const deletePost = async (req, res) => {
+  try {
+    let post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    if (post.user.toString() !== req.user.id) {
+      return res.status(401).json({ message: 'User not authorized' });
+    }
+
+    post = await Post.findByIdAndDelete(req.params.id);
+    return res.status(200).json({ message: 'Deleted successfully' });
+
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+}
 
 
 
-module.exports = { createPost, getPosts, getPost };
+
+module.exports = { createPost, getPosts, getPost, deletePost };
