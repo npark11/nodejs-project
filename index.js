@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser');
 const userRoute = require('./routes/userRoute');
 const productRoute = require('./routes/productRoute');
 const contactRoute = require('./routes/contactRoute');
+const postRoute = require('./routes/postRoute');
 const path = require('path');
 
 const app = express();
@@ -27,6 +28,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/users', userRoute);
 app.use('/api/products', productRoute);
 app.use('/api/contact', contactRoute);
+app.use('/api/posts', postRoute);
 
 
 app.get('/', (req, res) => {
