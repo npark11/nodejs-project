@@ -79,7 +79,7 @@ const getPost = async (req, res) => {
   }
 };
 
-// Delete Ppost
+// Delete Post
 const deletePost = async (req, res) => {
   try {
     let post = await Post.findById(req.params.id);
@@ -100,7 +100,67 @@ const deletePost = async (req, res) => {
   }
 }
 
+// Update Post
+const updatePost = async (req, res) => {
+  try {
+    const {title, category, desc } = req.body;
+    const { id } = req.params
+
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    if (post.user.toString() !== req.user.id) {
+      return res.status(401).json({ message: 'User not authorized' });
+    }
+
+    // Handle Image upload
+    let fileData = {}
+    if (req.file) {
+      // Save image to cloudinary
+      let uploadedFile;
+      try {
+        uploadedFile = await cloudinary.uploader.upload(req.file.path, {folder: "Blog App", resource_type: "image"});
+
+      } catch (error) {
+        return res.status(500).json({ error: 'Image could not be uploaded' });
+      };
+
+      fileData = {
+        fileName: req.file.originalname,
+        filePath: uploadedFile.secure_url,
+        fileType: req.file.mimetype,
+        fileSize: fileSizeFormatter(req.file.size, 2),
+      }
+    }
+  
+    // Update Post
+    const updatedPost = await Post.findByIdAndUpdate(
+      {_id: id},
+      {
+        title,
+        category,
+        desc,
+        image: Object.keys(fileData).length === 0 ? post?.image : fileData,
+      },
+      {
+        new: true,
+        runValidators: true
+      }
+    )
+
+    return res.status(200).json(updatedPost);
+    
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+}
 
 
 
-module.exports = { createPost, getPosts, getPost, deletePost };
+
+
+
+module.exports = { createPost, getPosts, getPost, deletePost, updatePost };
