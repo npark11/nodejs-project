@@ -58,9 +58,28 @@ const getPosts = async (req, res) => {
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
-}
+};
+
+// Get Single Post
+const getPost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json("Post not found");
+    }
+
+    // if (post.user.toString() !== req.user.id) {
+    //   return res.status(401).json("User not authorized");
+    // }
+
+    return res.status(200).json(post);
+    
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};
 
 
 
 
-module.exports = { createPost, getPosts };
+module.exports = { createPost, getPosts, getPost };
