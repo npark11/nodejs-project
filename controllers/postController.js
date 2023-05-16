@@ -41,7 +41,14 @@ const createPost = async (req, res) => {
       image: fileData
     });
 
-    return res.status(201).json(post);
+    // Fetch the associated user's name and update the post
+    const populatedPost = await Post.findById(post._id)
+      .populate('user', 'name')
+      .exec();
+
+    return res.status(201).json(populatedPost);
+
+    // return res.status(201).json(post);
 
 
   } catch (err) {
@@ -52,7 +59,15 @@ const createPost = async (req, res) => {
 // Get All Posts
 const getPosts = async (req, res) => {
   try {
-    const posts = await Post.find({user: req.user.id}).sort("-createdAt");
+    const category = req.query.cat; // Assuming the category is passed as a query parameter
+    let posts;
+
+    if (category) {
+      posts = await Post.find({ category }).sort('-createdAt').populate('user', 'name');
+    } else {
+      posts = await Post.find({}).sort('-createdAt').populate('user', 'name');
+    }
+
     return res.status(200).json(posts);
 
   } catch (err) {
