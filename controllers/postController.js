@@ -78,14 +78,10 @@ const getPosts = async (req, res) => {
 // Get Single Post
 const getPost = async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findById(req.params.id).populate('user', 'name');
     if (!post) {
       return res.status(404).json("Post not found");
     }
-
-    // if (post.user.toString() !== req.user.id) {
-    //   return res.status(401).json("User not authorized");
-    // }
 
     return res.status(200).json(post);
     
@@ -97,13 +93,13 @@ const getPost = async (req, res) => {
 // Delete Post
 const deletePost = async (req, res) => {
   try {
-    let post = await Post.findById(req.params.id);
+    let post = await Post.findById(req.params.id).populate('user', 'name');
 
     if (!post) {
       return res.status(404).json({ message: 'Post not found' });
     }
 
-    if (post.user.toString() !== req.user.id) {
+    if (post.user._id.toString() !== req.user._id.toString()) {
       return res.status(401).json({ message: 'User not authorized' });
     }
 
