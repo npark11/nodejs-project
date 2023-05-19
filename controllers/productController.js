@@ -6,7 +6,7 @@ const cloudinary = require('cloudinary').v2;
 const createProduct = async (req, res) => {
   try {
     const {name, sku, category, quantity, price, description } = req.body;
-
+    console.log(req.body);
     // Validation
     if (!name || !category || !quantity || !price || !description) {
       return res.status(400).json({ error: 'Please fill all fields' });
