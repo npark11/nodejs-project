@@ -14,6 +14,7 @@ const createPost = async (req, res) => {
 
     // Hadle Image Upload
     let fileData = {}
+
     if (req.file) {
       // Save image to cloudinary
       let uploadedFile;
@@ -40,6 +41,8 @@ const createPost = async (req, res) => {
       desc,
       image: fileData
     });
+
+    console.log(post);
 
     // Fetch the associated user's name and update the post
     const populatedPost = await Post.findById(post._id)

@@ -7,7 +7,7 @@ const { upload } = require('../utils/fileUpload');
 
 router.post('/', protect, upload.single("image"), createPost);
 router.get('/', getPosts);
-router.get('/:id', getPost);
+router.get('/:id', protect, getPost);
 router.delete('/:id', protect, deletePost);
 router.patch('/:id', protect, upload.single("image"), updatePost);
 
